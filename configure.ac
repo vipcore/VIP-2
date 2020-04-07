@@ -13,10 +13,10 @@ AC_CONFIG_HEADERS([src/config/vip-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
 
-BITCOIN_DAEMON_NAME=pivxd
-BITCOIN_GUI_NAME=pivx-qt
-BITCOIN_CLI_NAME=pivx-cli
-BITCOIN_TX_NAME=pivx-tx
+BITCOIN_DAEMON_NAME=vipd
+BITCOIN_GUI_NAME=vip-qt
+BITCOIN_CLI_NAME=vip-cli
+BITCOIN_TX_NAME=vip-tx
 
 dnl Unless the user specified ARFLAGS, force it to be cr
 AC_ARG_VAR(ARFLAGS, [Flags for the archiver, defaults to <cr> if not set])
@@ -26,9 +26,9 @@ fi
 
 AC_CANONICAL_HOST
 
-AH_TOP([#ifndef PIV_CONFIG_H])
-AH_TOP([#define PIV_CONFIG_H])
-AH_BOTTOM([#endif //PIV_CONFIG_H])
+AH_TOP([#ifndef VIP_CONFIG_H])
+AH_TOP([#define VIP_CONFIG_H])
+AH_BOTTOM([#endif //VIP_CONFIG_H])
 
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
