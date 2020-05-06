@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=VIP Core
+Comment=VIP P2P Cryptocurrency
+Comment[fr]=VIP, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=VIP, eşten eşe kriptografik sanal para birimi
+Exec=vip-qt %u
+Terminal=false
+Type=Application
+Icon=vip128
+MimeType=x-scheme-handler/vip;
+Categories=Office;Finance;
+StartupWMClass=Pivx-qt

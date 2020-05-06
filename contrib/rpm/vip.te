@@ -1,0 +1,81 @@
+policy_module(vip, 1.100.1)
+
+########################################
+#
+# Declarations
+#
+
+type vip_t;
+type vip_exec_t;
+init_daemon_domain(vip_t, vip_exec_t)
+
+permissive vip_t;
+
+type vip_initrc_exec_t;
+init_script_file(vip_initrc_exec_t)
+
+type vip_conf_t;
+files_type(vip_conf_t)
+
+type vip_var_lib_t;
+files_type(vip_var_lib_t)
+
+type vip_var_run_t;
+files_type(vip_var_run_t)
+
+type vip_port_t;
+corenet_port(vip_port_t)
+
+########################################
+#
+# vip local policy
+#
+allow vip_t self:process { fork };
+
+allow vip_t self:fifo_file rw_fifo_file_perms;
+allow vip_t self:unix_stream_socket create_stream_socket_perms;
+
+manage_dirs_pattern(vip_t, vip_conf_t, vip_conf_t)
+manage_files_pattern(vip_t, vip_conf_t, vip_conf_t)
+
+manage_dirs_pattern(vip_t, vip_var_lib_t, vip_var_lib_t)
+manage_files_pattern(vip_t, vip_var_lib_t, vip_var_lib_t)
+files_var_lib_filetrans(vip_t, vip_var_lib_t, { dir file })
+
+manage_dirs_pattern(vip_t, vip_var_run_t, vip_var_run_t)
+manage_files_pattern(vip_t, vip_var_run_t, vip_var_run_t)
+
+sysnet_dns_name_resolve(vip_t)
+corenet_all_recvfrom_unlabeled(vip_t)
+
+allow vip_t self:tcp_socket create_stream_socket_perms;
+corenet_tcp_sendrecv_generic_if(vip_t)
+corenet_tcp_sendrecv_generic_node(vip_t)
+corenet_tcp_sendrecv_all_ports(vip_t)
+corenet_tcp_bind_generic_node(vip_t)
+
+gen_require(`
+    type vip_port_t;
+')
+allow vip_t vip_port_t:tcp_socket name_bind;
+
+gen_require(`
+    type vip_port_t;
+')
+allow vip_t vip_port_t:tcp_socket name_connect;
+
+domain_use_interactive_fds(vip_t)
+
+files_read_etc_files(vip_t)
+
+miscfiles_read_localization(vip_t)
+
+sysnet_dns_name_resolve(vip_t)
+
+allow vip_t vip_exec_t:file execute_no_trans;
+allow vip_t self:process setsched;
+corecmd_exec_ls(vip_t)
+corenet_tcp_connect_http_port(vip_t)
+dev_read_urand(vip_t)
+fs_getattr_xattr_fs(vip_t)
+kernel_read_system_state(vip_t)

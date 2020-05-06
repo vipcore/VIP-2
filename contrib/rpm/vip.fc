@@ -1,0 +1,8 @@
+/usr/bin/vip-cli		--	gen_context(system_u:object_r:vip_exec_t,s0)
+/usr/sbin/vipd		--	gen_context(system_u:object_r:vip_exec_t,s0)
+/usr/lib(64)?/vip/vipd		--	gen_context(system_u:object_r:vip_exec_t,s0)
+
+/etc/vip(/.*)?		gen_context(system_u:object_r:vip_conf_t,s0)
+/var/lib/vip(/.*)?		gen_context(system_u:object_r:vip_var_lib_t,s0)
+
+(/var)?/run/vipd(/.*)?   gen_context(system_u:object_r:vip_var_run_t,s0)

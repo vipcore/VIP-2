@@ -1,0 +1,157 @@
+
+## <summary>policy for vip</summary>
+
+
+########################################
+## <summary>
+##	Transition to vip.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`vip_domtrans',`
+	gen_require(`
+		type vip_t, vip_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, vip_exec_t, vip_t)
+')
+
+
+########################################
+## <summary>
+##	Execute vip server in the vip domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`vip_initrc_domtrans',`
+	gen_require(`
+		type vip_initrc_exec_t;
+	')
+
+	init_labeled_script_domtrans($1, vip_initrc_exec_t)
+')
+
+
+########################################
+## <summary>
+##	Search vip lib directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`vip_search_lib',`
+	gen_require(`
+		type vip_var_lib_t;
+	')
+
+	allow $1 vip_var_lib_t:dir search_dir_perms;
+	files_search_var_lib($1)
+')
+
+########################################
+## <summary>
+##	Read vip lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`vip_read_lib_files',`
+	gen_require(`
+		type vip_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	read_files_pattern($1, vip_var_lib_t, vip_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Manage vip lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`vip_manage_lib_files',`
+	gen_require(`
+		type vip_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	manage_files_pattern($1, vip_var_lib_t, vip_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Manage vip lib directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`vip_manage_lib_dirs',`
+	gen_require(`
+		type vip_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	manage_dirs_pattern($1, vip_var_lib_t, vip_var_lib_t)
+')
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	a vip environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`vip_admin',`
+	gen_require(`
+		type vip_t;
+		type vip_initrc_exec_t;
+		type vip_var_lib_t;
+	')
+
+	allow $1 vip_t:process { ptrace signal_perms };
+	ps_process_pattern($1, vip_t)
+
+	vip_initrc_domtrans($1)
+	domain_system_change_exemption($1)
+	role_transition $2 vip_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	files_search_var_lib($1)
+	admin_pattern($1, vip_var_lib_t)
+
+')
+
