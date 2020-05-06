@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2018-2019 The PIVX developers
+// Copyright (c) 2018-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -48,8 +48,6 @@ const char* ScriptErrorString(const ScriptError serror)
             return "Operation not valid with the current altstack size";
         case SCRIPT_ERR_OP_RETURN:
             return "OP_RETURN was encountered";
-        case SCRIPT_ERR_OP_STAKEMODIFIER:
-            return "Attempted to use OP_STAKEMODIFIER";
         case SCRIPT_ERR_UNBALANCED_CONDITIONAL:
             return "Invalid OP_IF construction";
         case SCRIPT_ERR_NEGATIVE_LOCKTIME:

@@ -5,7 +5,7 @@
 #include "util.h"
 
 #include "allocators.h"
-#include "test/test_pivx.h"
+#include "test/test_vip.h"
 
 #include <boost/test/unit_test.hpp>
 

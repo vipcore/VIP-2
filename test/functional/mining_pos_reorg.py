@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2019 The PIVX developers
+# Copyright (c) 2019-2020 The VIP developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -51,6 +51,14 @@ class ReorgStakeTest(PivxTestFramework):
         wi = self.nodes[nodeid].getwalletinfo()
         return wi['balance'] + wi['immature_balance']
 
+    def check_money_supply(self, expected_vip, expected_zvip):
+        g_info = [self.nodes[i].getinfo() for i in range(self.num_nodes)]
+        # verify that nodes have the expected VIP and zVIP supply
+        for node in g_info:
+            assert_equal(node['moneysupply'], DecimalAmt(expected_vip))
+            for denom in node['zVIPsupply']:
+                assert_equal(node['zVIPsupply'][denom], DecimalAmt(expected_zvip[denom]))
+
 
     def run_test(self):
 
@@ -59,6 +67,24 @@ class ReorgStakeTest(PivxTestFramework):
                 if x["txid"] == txid and x["vout"] == vout:
                     return True, x
             return False, None
+
+        # Check VIP and zVIP supply at the beginning
+        # ------------------------------------------
+        # zVIP supply: 2 coins for each denomination
+        expected_zvip_supply = {
+            "1": 2,
+            "5": 10,
+            "10": 20,
+            "50": 100,
+            "100": 200,
+            "500": 1000,
+            "1000": 2000,
+            "5000": 10000,
+            "total": 13332,
+        }
+        # VIP supply: block rewards minus burned fees for minting
+        expected_money_supply = 250.0 * 330 - 16 * 0.01
+        self.check_money_supply(expected_money_supply, expected_zvip_supply)
 
         # Stake with node 0 and node 1 up to public spend activation (400)
         # 70 blocks: 5 blocks each (x7)
@@ -106,7 +132,10 @@ class ReorgStakeTest(PivxTestFramework):
         set_node_times(self.nodes, block_time_0)
         last_block = self.nodes[0].getblock(self.nodes[0].getbestblockhash())
         assert(len(last_block["tx"]) > 1)                                       # a PoS block has at least two txes
-        stakeinput = self.nodes[0].getrawtransaction(last_block["tx"][1], True)["vin"][0]
+        coinstake_txid = last_block["tx"][1]
+        coinstake_tx = self.nodes[0].getrawtransaction(coinstake_txid, True)
+        assert (coinstake_tx["vout"][0]["scriptPubKey"]["hex"] == "")  # first output of coinstake is empty
+        stakeinput = coinstake_tx["vin"][0]
 
         # The stake input was unspent 1 block ago, now it's not
         res, utxo = findUtxoInList(stakeinput["txid"], stakeinput["vout"], initial_unspent_0)
@@ -139,9 +168,9 @@ class ReorgStakeTest(PivxTestFramework):
         self.log.info("Balance for node 2 checks out.")
 
         # Double spending txes not possible
-        assert_raises_rpc_error(-26, "bad-txns-invalid-zpiv",
+        assert_raises_rpc_error(-26, "bad-txns-invalid-zvip",
                                 self.nodes[0].sendrawtransaction, tx_B0)
-        assert_raises_rpc_error(-26, "bad-txns-invalid-zpiv",
+        assert_raises_rpc_error(-26, "bad-txns-invalid-zvip",
                                 self.nodes[0].sendrawtransaction, tx_B1)
 
         # verify that the stakeinput can't be spent
@@ -200,6 +229,17 @@ class ReorgStakeTest(PivxTestFramework):
         sync_blocks(self.nodes)
         res, utxo = findUtxoInList(stakeinput["txid"], stakeinput["vout"], self.nodes[0].listunspent())
         assert (not res or not utxo["spendable"])
+
+        # Verify that VIP and zVIP supplies were properly updated after the spends and reorgs
+        self.log.info("Check VIP and zVIP supply...")
+        expected_money_supply += 250.0 * (self.nodes[1].getblockcount() - 330)
+        spent_coin_0 = mints[0]["denomination"]
+        spent_coin_1 = mints[1]["denomination"]
+        expected_zvip_supply[str(spent_coin_0)] -= spent_coin_0
+        expected_zvip_supply[str(spent_coin_1)] -= spent_coin_1
+        expected_zvip_supply["total"] -= (spent_coin_0 + spent_coin_1)
+        self.check_money_supply(expected_money_supply, expected_zvip_supply)
+        self.log.info("Supply checks out.")
 
 
 if __name__ == '__main__':

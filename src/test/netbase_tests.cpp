@@ -1,11 +1,11 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
 // Copyright (c) 2014-2015 The Dash Core developers
-// Copyright (c) 2015-2019 The PIVX developers
+// Copyright (c) 2015-2020 The VIP developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "netbase.h"
-#include "test/test_pivx.h"
+#include "test/test_vip.h"
 
 #include <string>
 
@@ -62,15 +62,15 @@ BOOST_AUTO_TEST_CASE(netbase_splithost)
     BOOST_CHECK(TestSplitHost("www.bitcoin.org:80", "www.bitcoin.org", 80));
     BOOST_CHECK(TestSplitHost("[www.bitcoin.org]:80", "www.bitcoin.org", 80));
     BOOST_CHECK(TestSplitHost("127.0.0.1", "127.0.0.1", -1));
-    BOOST_CHECK(TestSplitHost("127.0.0.1:51472", "127.0.0.1", 51472));
+    BOOST_CHECK(TestSplitHost("127.0.0.1:28188", "127.0.0.1", 28188));
     BOOST_CHECK(TestSplitHost("[127.0.0.1]", "127.0.0.1", -1));
-    BOOST_CHECK(TestSplitHost("[127.0.0.1]:51472", "127.0.0.1", 51472));
+    BOOST_CHECK(TestSplitHost("[127.0.0.1]:28188", "127.0.0.1", 28188));
     BOOST_CHECK(TestSplitHost("::ffff:127.0.0.1", "::ffff:127.0.0.1", -1));
-    BOOST_CHECK(TestSplitHost("[::ffff:127.0.0.1]:51472", "::ffff:127.0.0.1", 51472));
-    BOOST_CHECK(TestSplitHost("[::]:51472", "::", 51472));
-    BOOST_CHECK(TestSplitHost("::51472", "::51472", -1));
-    BOOST_CHECK(TestSplitHost(":51472", "", 51472));
-    BOOST_CHECK(TestSplitHost("[]:51472", "", 51472));
+    BOOST_CHECK(TestSplitHost("[::ffff:127.0.0.1]:28188", "::ffff:127.0.0.1", 28188));
+    BOOST_CHECK(TestSplitHost("[::]:28188", "::", 28188));
+    BOOST_CHECK(TestSplitHost("::28188", "::28188", -1));
+    BOOST_CHECK(TestSplitHost(":28188", "", 28188));
+    BOOST_CHECK(TestSplitHost("[]:28188", "", 28188));
     BOOST_CHECK(TestSplitHost("", "", -1));
 }
 
@@ -85,10 +85,10 @@ bool static TestParse(std::string src, std::string canon)
 BOOST_AUTO_TEST_CASE(netbase_lookupnumeric)
 {
     BOOST_CHECK(TestParse("127.0.0.1", "127.0.0.1:65535"));
-    BOOST_CHECK(TestParse("127.0.0.1:51472", "127.0.0.1:51472"));
+    BOOST_CHECK(TestParse("127.0.0.1:28188", "127.0.0.1:28188"));
     BOOST_CHECK(TestParse("::ffff:127.0.0.1", "127.0.0.1:65535"));
     BOOST_CHECK(TestParse("::", "[::]:65535"));
-    BOOST_CHECK(TestParse("[::]:51472", "[::]:51472"));
+    BOOST_CHECK(TestParse("[::]:28188", "[::]:28188"));
     BOOST_CHECK(TestParse("[127.0.0.1]", "127.0.0.1:65535"));
     BOOST_CHECK(TestParse(":::", ""));
 }
@@ -233,6 +233,31 @@ BOOST_AUTO_TEST_CASE(subnet_test)
     BOOST_CHECK_EQUAL(subnet.ToString(), "1.2.0.0/255.255.232.0");
     subnet = CSubNet("1:2:3:4:5:6:7:8/ffff:ffff:ffff:fffe:ffff:ffff:ffff:ff0f");
     BOOST_CHECK_EQUAL(subnet.ToString(), "1:2:3:4:5:6:7:8/ffff:ffff:ffff:fffe:ffff:ffff:ffff:ff0f");
+}
+
+BOOST_AUTO_TEST_CASE(validate_test)
+{
+    std::list<std::string> validIPv4 = {"11.12.13.14", "50.168.168.150", "72.31.250.250"};
+    std::list<std::string> validIPv6 = {"1111:2222:3333:4444:5555:6666::8888", "2001:0002:6c::430", "2002:cb0a:3cdd:1::1"};
+    std::list<std::string> validTor = {"5wyqrzbvrdsumnok.onion", "FD87:D87E:EB43:edb1:8e4:3588:e546:35ca"};
+
+    for (const std::string& ipStr : validIPv4)
+        BOOST_CHECK_MESSAGE(validateMasternodeIP(ipStr), ipStr);
+    for (const std::string& ipStr : validIPv6)
+        BOOST_CHECK_MESSAGE(validateMasternodeIP(ipStr), ipStr);
+    for (const std::string& ipStr : validTor)
+        BOOST_CHECK_MESSAGE(validateMasternodeIP(ipStr), ipStr);
+
+    std::list<std::string> invalidIPv4 = {"11.12.13.14.15", "11.12.13.330", "30.168.1.255.1", "192.168.1.1", "255.255.255.255"};
+    std::list<std::string> invalidIPv6 = {"1111:2222:3333:4444:5555:6666:7777:8888:9999", "2002:cb0a:3cdd::1::1", "1111:2222:3333:::5555:6666:7777:8888"};
+    std::list<std::string> invalidTor = {"5wyqrzbvrdsumnok.noonion"};
+
+    for (const std::string& ipStr : invalidIPv4)
+        BOOST_CHECK_MESSAGE(!validateMasternodeIP(ipStr), ipStr);
+    for (const std::string& ipStr : invalidIPv6)
+        BOOST_CHECK_MESSAGE(!validateMasternodeIP(ipStr), ipStr);
+    for (const std::string& ipStr : invalidTor)
+        BOOST_CHECK_MESSAGE(!validateMasternodeIP(ipStr), ipStr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

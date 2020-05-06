@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2020 The PIVX developers
+# Copyright (c) 2020 The VIP developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -43,7 +43,7 @@ class ImportStakingTest(PivxTestFramework):
                              for i in range(2 * NUM_OF_DELEGATIONS)]
         delegations = []
         for i, sa in enumerate(staking_addresses):
-            # delegate 10 PIV
+            # delegate 10 VIP
             delegations.append(self.nodes[0].delegatestake(sa, 10)['txid'])
             # mine a block and check staking balance
             self.nodes[0].generate(1)

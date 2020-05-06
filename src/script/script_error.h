@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2018-2019 The PIVX developers
+// Copyright (c) 2018-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,7 +13,6 @@ typedef enum ScriptError_t
     SCRIPT_ERR_UNKNOWN_ERROR,
     SCRIPT_ERR_EVAL_FALSE,
     SCRIPT_ERR_OP_RETURN,
-    SCRIPT_ERR_OP_STAKEMODIFIER,
 
     /* Max sizes */
     SCRIPT_ERR_SCRIPT_SIZE,

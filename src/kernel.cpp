@@ -1,21 +1,20 @@
 // Copyright (c) 2011-2013 The PPCoin developers
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
-// Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2015-2020 The VIP developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "kernel.h"
 
-#include "consensus/tx_verify.h"
 #include "db.h"
 #include "legacy/stakemodifier.h"
 #include "script/interpreter.h"
 #include "util.h"
 #include "stakeinput.h"
 #include "utilmoneystr.h"
-#include "zpivchain.h"
-#include "zpiv/zpos.h"
+#include "zvipchain.h"
+#include "zvip/zpos.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -41,8 +40,8 @@ CStakeKernel::CStakeKernel(const CBlockIndex* const pindexPrev, CStakeInput* sta
         // Modifier v1
         stakeModifier << nStakeModifier;
     } else {
-        // Modifier v2 / v3
-        stakeModifier << pindexPrev->GetStakeModifier();
+        // Modifier v2
+        stakeModifier << pindexPrev->GetStakeModifierV2();
     }
     CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
     nTimeBlockFrom = pindexFrom->nTime;
@@ -172,8 +171,8 @@ bool CheckProofOfStake(const CBlock& block, std::string& strError, const CBlockI
         return false;
     }
 
-    // zPoS disabled (ContextCheck) before blocks V8, and the tx input signature is in CoinSpend
-    if (stakeInput->IsZPIV()) return true;
+    // zPoS disabled (ContextCheck) before blocks V7, and the tx input signature is in CoinSpend
+    if (stakeInput->IsZVIP()) return true;
 
     // Verify tx input signature
     CTxOut stakePrevout;
@@ -188,18 +187,6 @@ bool CheckProofOfStake(const CBlock& block, std::string& strError, const CBlockI
              TransactionSignatureChecker(&tx, 0), &serror)) {
         strError = strprintf("signature fails: %s", serror ? ScriptErrorString(serror) : "");
         return false;
-    }
-
-    // Verify modifier signature (from block V8+)
-    if (block.nVersion >= 8) {
-        if (nHeight < Params().GetConsensus().height_start_StakeModifierV3) {
-            strError = strprintf("Block version %d arrived too early (height %d)", block.nVersion, nHeight);
-            return false;
-        }
-        if (!CheckStakeModifierSig(tx, stakePrevout, pindexPrev->GetStakeModifier(), strError)) {
-            strError = strprintf("modifier signature fails: %s", strError);
-            return false;
-        }
     }
 
     // All good

@@ -1,11 +1,11 @@
-// Copyright (c) 2018 The PIVX developers
+// Copyright (c) 2018 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PIVX_INVALID_H
-#define PIVX_INVALID_H
+#ifndef VIP_INVALID_H
+#define VIP_INVALID_H
 
-#endif //PIVX_INVALID_H
+#endif //VIP_INVALID_H
 
 #include <libzerocoin/bignum.h>
 #include <univalue/include/univalue.h>

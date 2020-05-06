@@ -1,7 +1,9 @@
-// Copyright (c) 2020 The PIVX Core developers
+// Copyright (c) 2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
-#ifndef PIVX_HDCHAIN_H
-#define PIVX_HDCHAIN_H
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef VIP_HDCHAIN_H
+#define VIP_HDCHAIN_H
 
 #include "key.h"
 
@@ -61,4 +63,4 @@ public:
     }
 };
 
-#endif // PIVX_HDCHAIN_H
+#endif // VIP_HDCHAIN_H

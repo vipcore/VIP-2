@@ -30,6 +30,7 @@ struct Params {
     int nFutureTimeDriftPoS;
     int nMasternodeCountDrift;
     CAmount nMaxMoneyOut;
+    //CAmount nMasternodeCollateralAmt;
     int nPoolMaxTransactions;
     int64_t nProposalEstablishmentTime;
     int nStakeMinAge;
@@ -38,7 +39,6 @@ struct Params {
     int64_t nTargetTimespanV2;
     int64_t nTargetSpacing;
     int nTimeSlotLength;
-    std::string strObfuscationPoolDummyAddress;
 
     // spork keys
     std::string strSporkPubKey;
@@ -55,7 +55,6 @@ struct Params {
     int height_start_MessSignaturesV2;
     int height_start_StakeModifierNewSelection;
     int height_start_StakeModifierV2;               // Blocks v6 start
-    int height_start_StakeModifierV3;               // Blocks v8 start
     int height_start_TimeProtoV2;                   // Blocks v7 start
     int height_start_ZC;                            // Blocks v4 start
     int height_start_ZC_InvalidSerials;

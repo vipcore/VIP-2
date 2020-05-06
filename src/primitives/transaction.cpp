@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2019 The PIVX developers
+// Copyright (c) 2015-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -81,14 +81,6 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
     nRounds = -10;
 }
 
-bool COutPoint::IsMasternodeReward(const CTransaction* tx) const
-{
-    if(!tx->IsCoinStake())
-        return false;
-
-    return (n == tx->vout.size() - 1) && (tx->vout[1].scriptPubKey != tx->vout[n].scriptPubKey);
-}
-
 uint256 CTxOut::GetHash() const
 {
     return SerializeHash(*this);
@@ -114,20 +106,6 @@ bool CTxOut::GetKeyIDFromUTXO(CKeyID& keyIDRet) const
 bool CTxOut::IsZerocoinMint() const
 {
     return scriptPubKey.IsZerocoinMint();
-}
-
-bool CTxOut::IsStakeModifierSig() const
-{
-    return scriptPubKey.IsStakeModifierSig();
-}
-
-bool CTxOut::GetStakeModifierSig(std::vector<unsigned char>& vchSig) const
-{
-    if (!IsStakeModifierSig())
-        return false;
-
-    vchSig = std::vector<unsigned char>(scriptPubKey.begin()+2, scriptPubKey.end());
-    return true;
 }
 
 CAmount CTxOut::GetZerocoinMinted() const
@@ -206,7 +184,7 @@ bool CTransaction::HasZerocoinMintOutputs() const
 
 bool CTransaction::HasZerocoinPublicSpendInputs() const
 {
-    // The wallet only allows publicSpend inputs in the same tx and not a combination between piv and zpiv
+    // The wallet only allows publicSpend inputs in the same tx and not a combination between vip and zvip
     for(const CTxIn& txin : vin) {
         if (txin.IsZerocoinPublicSpend())
             return true;
@@ -223,10 +201,7 @@ bool CTransaction::IsCoinStake() const
     if (vin[0].prevout.IsNull() && !fAllowNull)
         return false;
 
-    // coinstake transactions are marked with the first output, which can either be
-    // empty or with a script publishing the modifier signature (via OP_STAKEMODIFIER)
-    return (vout.size() >= 2 &&
-                    (vout[0].IsEmpty() || vout[0].IsStakeModifierSig()));
+    return (vout.size() >= 2 && vout[0].IsEmpty());
 }
 
 bool CTransaction::CheckColdStake(const CScript& script) const
@@ -268,7 +243,7 @@ CAmount CTransaction::GetValueOut() const
     CAmount nValueOut = 0;
     for (std::vector<CTxOut>::const_iterator it(vout.begin()); it != vout.end(); ++it)
     {
-        // PIVX: previously MoneyRange() was called here. This has been replaced with negative check and boundary wrap check.
+        // VIP: previously MoneyRange() was called here. This has been replaced with negative check and boundary wrap check.
         if (it->nValue < 0)
             throw std::runtime_error("CTransaction::GetValueOut() : value out of range : less than 0");
 

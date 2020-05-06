@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2019 The PIVX developers
+// Copyright (c) 2016-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -71,19 +71,10 @@ CBlockIndex::CBlockIndex(const CBlock& block):
         nBits{block.nBits},
         nNonce{block.nNonce}
 {
-    ClearMapZcSupply();
     if(block.nVersion > 3 && block.nVersion < 7)
         nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
     if (block.IsProofOfStake())
         SetProofOfStake();
-}
-
-void CBlockIndex::ClearMapZcSupply()
-{
-    mapZerocoinSupply.clear();
-    // Start supply of each denomination with 0s
-    for (auto& denom : libzerocoin::zerocoinDenomList)
-        mapZerocoinSupply.insert(std::make_pair(denom, 0));
 }
 
 std::string CBlockIndex::ToString() const
@@ -207,7 +198,7 @@ void CBlockIndex::SetNewStakeModifier()
     return SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
 }
 
-// Sets V2 or V3 stake modifiers (uint256)
+// Sets V2 stake modifiers (uint256)
 void CBlockIndex::SetStakeModifier(const uint256& nStakeModifier)
 {
     vStakeModifier.clear();
@@ -217,35 +208,15 @@ void CBlockIndex::SetStakeModifier(const uint256& nStakeModifier)
 // Generates and sets new V2 stake modifier
 void CBlockIndex::SetNewStakeModifier(const uint256& prevoutId)
 {
-    // Shouldn't be called on V1 or V3+ modifier's blocks (or before setting pprev)
+    // Shouldn't be called on V1 modifier's blocks (or before setting pprev)
     if (nHeight < Params().GetConsensus().height_start_StakeModifierV2) return;
-    if (nHeight >= Params().GetConsensus().height_start_StakeModifierV3) return;
     if (!pprev) throw std::runtime_error(strprintf("%s : ERROR: null pprev", __func__));
 
     // Generate Hash(prevoutId | prevModifier) - switch with genesis modifier (0) on upgrade block
     CHashWriter ss(SER_GETHASH, 0);
     ss << prevoutId;
-    ss << pprev->GetStakeModifier();
+    ss << pprev->GetStakeModifierV2();
     SetStakeModifier(ss.GetHash());
-}
-
-// Generates and sets new V3 stake modifier from coinstake marker (first output)
-void CBlockIndex::SetNewStakeModifier(const CTxOut& txout)
-{
-    // Shouldn't be called on V1 or V2 modifier's blocks
-    if (nHeight < Params().GetConsensus().height_start_StakeModifierV3) return;
-
-    // Get previous modifier signature from coinstake marker
-    std::vector<unsigned char> modifierSig;
-    if (!txout.GetStakeModifierSig(modifierSig)) {
-        // should never happen (block already accepted)
-        throw std::runtime_error("unable to get stake modifier signature");
-    }
-
-    // Generate Hash(modifierSig)
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << modifierSig;
-    return SetStakeModifier(ss.GetHash());
 }
 
 // Returns V1 stake modifier (uint64_t)
@@ -258,8 +229,8 @@ uint64_t CBlockIndex::GetStakeModifierV1() const
     return nStakeModifier;
 }
 
-// Returns V2/V3 stake modifier (uint256)
-uint256 CBlockIndex::GetStakeModifier() const
+// Returns V2 stake modifier (uint256)
+uint256 CBlockIndex::GetStakeModifierV2() const
 {
     if (vStakeModifier.empty() || nHeight < Params().GetConsensus().height_start_StakeModifierV2)
         return UINT256_ZERO;
@@ -295,22 +266,4 @@ bool CBlockIndex::RaiseValidity(enum BlockStatus nUpTo)
  * CBlockIndex - Legacy Zerocoin
  */
 
-int64_t CBlockIndex::GetZerocoinSupply() const
-{
-    int64_t nTotal = 0;
-    for (auto& denom : libzerocoin::zerocoinDenomList) {
-        nTotal += GetZcMintsAmount(denom);
-    }
-    return nTotal;
-}
-
-int64_t CBlockIndex::GetZcMints(libzerocoin::CoinDenomination denom) const
-{
-    return mapZerocoinSupply.at(denom);
-}
-
-int64_t CBlockIndex::GetZcMintsAmount(libzerocoin::CoinDenomination denom) const
-{
-    return libzerocoin::ZerocoinDenominationToAmount(denom) * GetZcMints(denom);
-}
 

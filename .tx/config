@@ -2,6 +2,6 @@
 host = https://www.transifex.com
 
 [pivx-project-translations.qt-translation-40x]
-file_filter = src/qt/locale/pivx_<lang>.ts
-source_file = src/qt/locale/pivx_en.ts
+file_filter = src/qt/locale/vip_<lang>.ts
+source_file = src/qt/locale/vip_en.ts
 source_lang = en

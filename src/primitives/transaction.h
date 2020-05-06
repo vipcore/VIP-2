@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2019 The PIVX developers
+// Copyright (c) 2015-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -35,7 +35,6 @@ public:
 
     void SetNull() { hash.SetNull(); n = (uint32_t) -1; }
     bool IsNull() const { return (hash.IsNull() && n == (uint32_t) -1); }
-    bool IsMasternodeReward(const CTransaction* tx) const;
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
     {
@@ -164,19 +163,16 @@ public:
 
     bool IsDust(CFeeRate minRelayTxFee) const
     {
-        // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units upiv-per-kilobyte.
+        // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units uvip-per-kilobyte.
         // If you'd pay more than 1/3 in fees to spend something, then we consider it dust.
         // A typical txout is 34 bytes big, and will need a CTxIn of at least 148 bytes to spend
-        // i.e. total is 148 + 32 = 182 bytes. Default -minrelaytxfee is 10000 upiv per kB
-        // and that means that fee per txout is 182 * 10000 / 1000 = 1820 upiv.
-        // So dust is a txout less than 1820 *3 = 5460 upiv
-        // with default -minrelaytxfee = minRelayTxFee = 10000 upiv per kB.
+        // i.e. total is 148 + 32 = 182 bytes. Default -minrelaytxfee is 10000 uvip per kB
+        // and that means that fee per txout is 182 * 10000 / 1000 = 1820 uvip.
+        // So dust is a txout less than 1820 *3 = 5460 uvip
+        // with default -minrelaytxfee = minRelayTxFee = 10000 uvip per kB.
         size_t nSize = GetSerializeSize(SER_DISK,0)+148u;
         return (nValue < 3*minRelayTxFee.GetFee(nSize));
     }
-
-    bool IsStakeModifierSig() const;
-    bool GetStakeModifierSig(std::vector<unsigned char>& vchSig) const;
 
     bool IsZerocoinMint() const;
     CAmount GetZerocoinMinted() const;

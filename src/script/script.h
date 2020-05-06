@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2016-2019 The PIVX developers
+// Copyright (c) 2016-2020 The VIP developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -178,9 +178,6 @@ enum opcodetype
 
     // cold staking
     OP_CHECKCOLDSTAKEVERIFY = 0xd1,
-
-    // v3 stake modifier
-    OP_STAKEMODIFIER = 0xd2,
 
     // template matching params
     OP_SMALLINTEGER = 0xfa,
@@ -619,7 +616,6 @@ public:
     bool IsPayToScriptHash() const;
     bool IsPayToColdStaking() const;
     bool StartsWithOpcode(const opcodetype opcode) const;
-    bool IsStakeModifierSig() const;
     bool IsZerocoinMint() const;
     bool IsZerocoinSpend() const;
     bool IsZerocoinPublicSpend() const;
