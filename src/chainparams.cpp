@@ -14,7 +14,7 @@
 #include "utilstrencodings.h"
 
 #include <assert.h>
-#include "uint256.h"//Mod.
+
 #include <boost/assign/list_of.hpp>
 #include <limits>
 
@@ -61,7 +61,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "WHO announces COVID-19 outbreak a pandemic - 12/Mar/2020";
+    const char* pszTimestamp = "WHO announces COVID-19 outbreak as global pandemic - 12/Mar/2020.";
     const CScript genesisOutputScript = CScript() << ParseHex("04ffff001d01043957484f20616e6e6f756e63657320434f5649442d3139206f7574627265616b20612070616e64656d6963202d2031322f4d61722f323032302e") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
@@ -94,7 +94,7 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
-    (0, uint256S("0x000003a730260214fe1f273a1f29256701de87caf976567f62b1c93fea80e4c4"))
+    (0, uint256S("0x000005e33ade1216fadbc7dee6b1bc5e4a190014763ca6f47c90c38d3e0b7b46"))
     ; 
 
 static const Checkpoints::CCheckpointData data = {
@@ -131,10 +131,10 @@ public:
         networkID = CBaseChainParams::MAIN;
         strNetworkID = "main";
 
-        genesis = CreateGenesisBlock(1584051695, 1427247, 0x1e0ffff0, 1, 250 * COIN);
+        genesis = CreateGenesisBlock(1584051695, 942011, 0x1e0ffff0, 4, 250 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000003a730260214fe1f273a1f29256701de87caf976567f62b1c93fea80e4c4"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12604358bc0927c152d1cae0c580cf3c7464cfcd8a344c8b6bfa694d01807e97"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000005e33ade1216fadbc7dee6b1bc5e4a190014763ca6f47c90c38d3e0b7b46"));
+        assert(genesis.hashMerkleRoot == uint256S("0x44233b9b9938933d97a59648a88295c0841f8de3e170ee9a561137c9200b7379"));
 
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // VIP starting difficulty is 1 / 2^12
@@ -245,10 +245,10 @@ public:
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";  
 
-        genesis = CreateGenesisBlock(1584051695, 1427247, 0x1e0ffff0, 1, 250 * COIN);
+        genesis = CreateGenesisBlock(1584051695, 942011, 0x1e0ffff0, 4, 250 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000003a730260214fe1f273a1f29256701de87caf976567f62b1c93fea80e4c4"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12604358bc0927c152d1cae0c580cf3c7464cfcd8a344c8b6bfa694d01807e97"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000005e33ade1216fadbc7dee6b1bc5e4a190014763ca6f47c90c38d3e0b7b46"));
+        assert(genesis.hashMerkleRoot == uint256S("0x44233b9b9938933d97a59648a88295c0841f8de3e170ee9a561137c9200b7379"));
 
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // VIP starting difficulty is 1 / 2^12
@@ -362,10 +362,10 @@ public:
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
 
-        genesis = CreateGenesisBlock(1584051695, 1427247, 0x1e0ffff0, 1, 250 * COIN);
+        genesis = CreateGenesisBlock(1584051695, 942011, 0x1e0ffff0, 4, 250 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000003a730260214fe1f273a1f29256701de87caf976567f62b1c93fea80e4c4"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12604358bc0927c152d1cae0c580cf3c7464cfcd8a344c8b6bfa694d01807e97"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000005e33ade1216fadbc7dee6b1bc5e4a190014763ca6f47c90c38d3e0b7b46"));
+        assert(genesis.hashMerkleRoot == uint256S("0x44233b9b9938933d97a59648a88295c0841f8de3e170ee9a561137c9200b7379"));
 
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // VIP starting difficulty is 1 / 2^12
